@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Code is checked out from Git automatically by Jenkins
+                echo 'Source code checked out from Git repository'
+            }
+        }
+
+        stage('Install Dependencies, Build & Test') {
+            steps {
+                // Maven (package manager) command
+                // - downloads dependencies from pom.xml (JUnit)
+                // - compiles code
+                // - runs tests
+                // - builds JAR file
+                bat 'mvn clean install'
+            }
+        }
+
+        stage('Archive Artifact') {
+            steps {
+                // Archive the generated JAR as build artifact
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check console output.'
+        }
+    }
+}
